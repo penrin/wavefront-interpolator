@@ -138,6 +138,6 @@ if __name__ == '__main__':
     ax3.imshow(err / MAX, cmap=plt.cm.bwr,
             vmin=-1., vmax=1., interpolation='None')
 
+    #plt.savefig('sample.jpg')
     plt.show()
-
 

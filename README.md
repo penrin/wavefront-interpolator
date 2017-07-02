@@ -33,6 +33,9 @@ $ git clone https://github.com/penrin/wavefront-interpolator
 -------------------
 
 ```
-$ cd wavefront-interpolator
+$ cd wavefront-interpolator/
 $ python sample.py
 ```
+
+![結果](https://github.com/penrin/wavefront-interpolator/sample.jpg)
+
