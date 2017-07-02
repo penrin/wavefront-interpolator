@@ -37,5 +37,5 @@ $ cd wavefront-interpolator/
 $ python sample.py
 ```
 
-![結果](https://github.com/penrin/wavefront-interpolator/sample.jpg)
+![結果](https://raw.githubusercontent.com/penrin/wavefront-interpolator/master/sample.jpg)
 
