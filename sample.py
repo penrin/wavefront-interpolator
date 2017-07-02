@@ -5,7 +5,7 @@
 #--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 import numpy as np
 import matplotlib.pyplot as plt
-import ipmat
+import interpolator
 
 
 if __name__ == '__main__':
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     ## ----- (2) Interpolation インスタンス作成 -----
 
-    ip = ipmat.Interpolation()
+    ip = interpolator.Interpolation()
 
 
 
