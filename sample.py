@@ -112,22 +112,22 @@ if __name__ == '__main__':
     ax0 = fig.add_subplot(141)
     ax0.set_title('Original')
     ax0.imshow(p_original / MAX, cmap=plt.cm.bwr,
-            vmin=-1., vmax=1., interpolation='None')
+            vmin=-1., vmax=1., interpolation='bicubic')
 
     ax1 = fig.add_subplot(142)
     ax1.set_title('Sampling')
     ax1.imshow(p_sampling / MAX, cmap=plt.cm.bwr,
-            vmin=-1., vmax=1., interpolation='None')
+            vmin=-1., vmax=1., interpolation='none')
 
     ax2 = fig.add_subplot(143)
     ax2.set_title('Interpolation')
     ax2.imshow(p_interpolation / MAX, cmap=plt.cm.bwr,
-            vmin=-1., vmax=1., interpolation='None')
+            vmin=-1., vmax=1., interpolation='bicubic')
 
     ax3 = fig.add_subplot(144)
     ax3.set_title('Error')
     ax3.imshow(err / MAX, cmap=plt.cm.bwr,
-            vmin=-1., vmax=1., interpolation='None')
+            vmin=-1., vmax=1., interpolation='bicubic')
 
     #plt.savefig('sample.jpg')
     plt.show()
