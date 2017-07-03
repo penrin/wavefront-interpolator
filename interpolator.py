@@ -24,7 +24,7 @@ class Interpolation():
     # 補間点座標
     xy_interpolation = (np.array([]), np.array([]))
 
-    # 境界離散点座標（２点 Gauss-Legendre 求積用）
+    # 境界積分点座標（２点 Gauss-Legendre 求積用）
     xy_boundary = (
             (np.array([]), np.array([])), # 座標 (x, y)
             (np.array([]), np.array([]))  # 外向き法線ベクトル (u, v)
@@ -123,6 +123,89 @@ class Interpolation():
                 -1. * green2d_dash(xi, yi, xb, yb, ub, vb, k)
                 ]
         return G
+    
+
+    # 境界積分点（円形）を自動生成
+    def roundboundary(self, center, radius, NBE):
+        # center: 円の中心
+        # radius: 円の半径
+        # NBE: 境界要素数
+        center_x = center[0]
+        center_y = center[1]
+        R = radius
+        angle = 2. * np.pi / NBE
+        ew = R * angle # Element width
+        theta = np.linspace(0, 2. * np.pi, NBE)
+        thetaP = theta + angle / (2. * np.sqrt(3))
+        thetaM = theta - angle / (2. * np.sqrt(3))
+        xb = np.r_[R * np.cos(thetaM) + center_x, R * np.cos(thetaP) + center_x]
+        yb = np.r_[R * np.sin(thetaM) + center_y, R * np.sin(thetaP) + center_y]
+        ub = np.r_[np.cos(thetaM), np.cos(thetaP)]
+        vb = np.r_[np.sin(thetaM), np.sin(thetaP)]
+        self.xy_boundary = ((xb, yb), (ub, vb))
+        return ew
+
+
+    # 境界積分点（矩形）の自動生成
+    def squareboundary(self, center, ratio, margin, NBE):
+        # center: 矩形の中心
+        # ratio: 矩形のアスペクト比 (タテ, ヨコ) 整数。
+        # margin: [m] 余白（補間点・境界の最低距離）
+        # NBE: 境界要素数
+        xi = self.xy_interpolation[0]
+        yi = self.xy_interpolation[1]
+        xfar = np.max(np.abs(xi - center[0]))
+        yfar = np.max(np.abs(yi - center[1]))
+        if (ratio[0] / ratio[1]) > (yfar / xfar):
+            # x 方向の margin をとる
+            xwidth = (xfar + margin) * 2
+            ywidth = xwidth / ratio[1] * ratio[0]
+            i = np.where(np.abs(xi - center[0]) == xfar)
+        else:
+            # y 方向の margin をとる
+            ywidth = (yfar + margin) * 2
+            xwidth = ywidth / ratio[0] * ratio[1]
+            i = np.where(np.abs(yi - center[1]) == yfar)
+        
+        xNBE = int(NBE / 2 / sum(ratio) * ratio[1])
+        yNBE = int(NBE / 2 / sum(ratio) * ratio[0])
+        ew = xwidth / xNBE # Element width
+        shift_m = ew * (1 - 1 /np.sqrt(3)) / 2
+        shift_p = ew * (1 + 1 /np.sqrt(3)) / 2
+        xb = np.r_[
+                np.linspace(0, xwidth, xNBE, endpoint=False) + shift_m,
+                np.linspace(0, xwidth, xNBE, endpoint=False) + shift_p,
+                np.linspace(0, xwidth, xNBE, endpoint=False) + shift_m,
+                np.linspace(0, xwidth, xNBE, endpoint=False) + shift_p,
+                np.zeros(yNBE),
+                np.zeros(yNBE),
+                np.zeros(yNBE) + xwidth,
+                np.zeros(yNBE) + xwidth
+                ] - xwidth / 2 + center[0]
+        yb = np.r_[
+                np.zeros(xNBE),
+                np.zeros(xNBE),
+                np.zeros(xNBE) + ywidth,
+                np.zeros(xNBE) + ywidth,
+                np.linspace(0, ywidth, yNBE, endpoint=False) + shift_m,
+                np.linspace(0, ywidth, yNBE, endpoint=False) + shift_p,
+                np.linspace(0, ywidth, yNBE, endpoint=False) + shift_m,
+                np.linspace(0, ywidth, yNBE, endpoint=False) + shift_p
+                ] - ywidth / 2 + center[1]
+        ub = np.r_[
+                np.zeros(xNBE * 2),
+                np.zeros(xNBE * 2),
+                np.ones(yNBE * 2) * -1,
+                np.ones(yNBE * 2),
+                ]
+        vb = np.r_[
+                np.ones(xNBE * 2) * -1,
+                np.ones(xNBE * 2),
+                np.zeros(yNBE * 2),
+                np.zeros(yNBE * 2)
+                ]
+        self.xy_boundary = ((xb, yb), (ub, vb))
+        return ew
 
 
 
@@ -146,7 +229,6 @@ def green2d_dash(xs, ys, xb, yb, ub, vb, k):
     innerProduct = (xs - xb) * ub + (ys - yb) * vb
     Gd = (1.j * k / 4.) * hankel1(1., k * r) * innerProduct / r
     return Gd
-
 
 
 
