@@ -135,6 +135,7 @@ class Interpolation():
         R = radius
         angle = 2. * np.pi / NBE
         ew = R * angle # Element width
+        bl = R * 2. * np.pi
         theta = np.linspace(0, 2. * np.pi, NBE)
         thetaP = theta + angle / (2. * np.sqrt(3))
         thetaM = theta - angle / (2. * np.sqrt(3))
@@ -143,7 +144,7 @@ class Interpolation():
         ub = np.r_[np.cos(thetaM), np.cos(thetaP)]
         vb = np.r_[np.sin(thetaM), np.sin(thetaP)]
         self.xy_boundary = ((xb, yb), (ub, vb))
-        return ew
+        return ew, bl
 
 
     # 境界積分点（矩形）の自動生成
@@ -169,7 +170,8 @@ class Interpolation():
         
         xNBE = int(NBE / 2 / sum(ratio) * ratio[1])
         yNBE = int(NBE / 2 / sum(ratio) * ratio[0])
-        ew = xwidth / xNBE # Element width
+        bl = (xwidth + ywidth) * 2 # 周の長さ
+        ew = bl / NBE # Element width
         shift_m = ew * (1 - 1 /np.sqrt(3)) / 2
         shift_p = ew * (1 + 1 /np.sqrt(3)) / 2
         xb = np.r_[
@@ -205,7 +207,7 @@ class Interpolation():
                 np.zeros(yNBE * 2)
                 ]
         self.xy_boundary = ((xb, yb), (ub, vb))
-        return ew
+        return ew, bl
 
 
 
@@ -229,6 +231,7 @@ def green2d_dash(xs, ys, xb, yb, ub, vb, k):
     innerProduct = (xs - xb) * ub + (ys - yb) * vb
     Gd = (1.j * k / 4.) * hankel1(1., k * r) * innerProduct / r
     return Gd
+
 
 
 
