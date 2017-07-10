@@ -47,7 +47,7 @@ if __name__ == '__main__':
     radius = 0.12 # [m] 半径
     NBE = 300 # 境界要素数
 
-    ew = ip.roundboundary((center_x, center_y), radius, NBE)
+    ew, _ = ip.roundboundary((center_x, center_y), radius, NBE)
     '''
     # 矩形の境界（自動生成）
     center_x = np.mean(xi.reshape(-1)) # 矩形の中心
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     ratio = (18, 14) # 矩形のアスペクト比 (タテ, ヨコ) 整数。
     NBE = sum(ratio) * 2 * 5 # NBE: 境界要素数
     
-    ew = ip.squareboundary((center_x, center_y), ratio, margin, NBE)
+    ew, _ = ip.squareboundary((center_x, center_y), ratio, margin, NBE)
     
     print('λ/d: %.2f' % (wavelength / ew))
 
@@ -69,16 +69,16 @@ if __name__ == '__main__':
 
     ## ----- （デモ用に音圧分布を計算） -----
 
-    # 音源位置（境界の外側であること）
+    # 円筒波源位置（境界の外側であること）
     src_x, src_y = (-0.2, -0.2)
 
     # オリジナル（補間点を流用）
     r_original = np.sqrt((xi - src_x) ** 2 + (yi - src_y) ** 2)
-    p_original = (1. / r_original) * np.exp(-1.j * wavenumber * r_original).real
+    p_original = np.cos(wavenumber * r_original) / np.sqrt(r_original)
 
     # サンプリング
     r_sampling = np.sqrt((xs - src_x) ** 2 + (ys - src_y) ** 2)
-    p_sampling = (1. / r_sampling) * np.exp(-1.j * wavenumber * r_sampling).real
+    p_sampling = np.cos(wavenumber * r_sampling) / np.sqrt(r_sampling)
 
 
 
