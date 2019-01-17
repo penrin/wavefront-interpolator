@@ -107,6 +107,26 @@ class Interpolation():
                 )
         return Ginv
 
+    def s2b_pinv(self, rcond=1e-15, v=False):
+        xs = self.xy_sample[0].reshape(-1, 1) # 列ベクトル
+        ys = self.xy_sample[1].reshape(-1, 1)
+        xb = self.xy_boundary[0][0].reshape(1, -1) # 行ベクトル
+        yb = self.xy_boundary[0][1].reshape(1, -1)
+        ub = self.xy_boundary[1][0].reshape(1, -1)
+        vb = self.xy_boundary[1][1].reshape(1, -1)
+        k = self.wavenumber
+        G = np.c_[
+                green2d(xs, ys, xb, yb, k),
+                -1. * green2d_dash(xs, ys, xb, yb, ub, vb, k)
+                ]
+        # Psuedo-inverse matrix (Tikhonov regularization)
+        beta = self.beta
+        I = np.identity(G.shape[1])
+        Ginv = np.dot(
+                np.linalg.inv(np.dot(np.conj(G.T), G) + beta * I),
+                np.conj(G.T)
+                )
+        return Ginv
 
     # boundary -> interpolation-samples matrix
     # (Direct problem)
